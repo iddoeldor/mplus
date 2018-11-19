@@ -1,0 +1,10 @@
+{
+  "name": "Monomer",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "frida": "latest",
+    "frida-load": "latest",
+    "fs-extra": "^7.0.0"
+  }
+}
