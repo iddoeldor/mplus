@@ -10,7 +10,7 @@ interceptors should be inside `/__handlers__/$PACKAGE_ID$/inject.js`
 
 question ? [click here](https://github.com/iddoeldor/mplus/issues/new)
 
-I'll update this README with GIFs and couple more examples
+I'll update this README with GIFs and couple more examples (+ update the db interface to use mongodb)
 
 
 GL & HF
