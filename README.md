@@ -4,7 +4,7 @@ Install Node.js, run `npm install` to install dependencies
 
 Run it via `./app.js $PACKAGE_ID$`
 
-read the class hierarchy output @ `/__handlers__/$PACKAGE_ID$/metadata.json`, pick intersting method & interceot with `intercept({ className: "NetworkDriver", methodName: "SomeMethod" });` to log the method & arguments
+read the class hierarchy output @ `/__handlers__/$PACKAGE_ID$/metadata.json`, pick intersting method & intercept with `intercept({ className: "NetworkDriver", methodName: "SomeMethod" });` to log the method & arguments
 
 interceptors should be inside `/__handlers__/$PACKAGE_ID$/inject.js` 
 
@@ -14,3 +14,11 @@ I'll update this README with GIFs and couple more examples (+ update the db inte
 
 
 GL & HF
+
+
+
+
+
+References
+
+* [frida setup & basics](https://youtu.be/sdpEJguRd6o?t=1070)
