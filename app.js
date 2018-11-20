@@ -50,21 +50,22 @@ const db = {
         const data = exclude(payload, ['event', 'index'/*, payload['index']*/]);
         this.cache[fname] = data;
         fse.outputJsonSync(this.fp(fname), data);
-        console.log(`[PUT] [ ${fname} ] [ ${data} ]`);
+        console.log(`[PUT] [ ${fname} ] [ ${JSON.stringify(data)} ]`);
     },
     get: function (payload) {
         let fname = payload[Object.keys(payload).filter(key => key !== 'event')[0]];
         if (this.cache[fname]) {
-            console.log(`[GET] [CACHED] [ ${this.cache[fname]} ]`);
+            console.log(`[GET] [CACHED] [ ${JSON.stringify(this.cache[fname])} ]`);
         } else {
             let filePath = this.fp(fname);
             let content = fse.readJSONSync(filePath, { throws: false });
-            console.log(`[GET] [ ${filePath} ] [ ${content} ]`);
+            console.log(`[GET] [ ${filePath} ] [ ${JSON.stringify(content)} ]`);
             this.cache[fname] = content;
         }
     }
 };
 
+// TODO if dir not exist, create & create "inject.js" file
 const source = fs.readFileSync('./engine.js').toString()
     .replace('/*placeholder*/', fs.readFileSync(APP_DIR + 'inject.js'));
 
