@@ -22,3 +22,4 @@ GL & HF
 References
 
 * [frida setup & basics](https://youtu.be/sdpEJguRd6o?t=1070)
+* [Related](https://github.com/frida/frida/issues/572)
