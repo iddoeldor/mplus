@@ -3,9 +3,6 @@ const IGNORE_ARG = '-';
 const MIN_HEAP_SIZE = 10000;
 
 // Utils
-function str(p) {
-    return Memory.readUtf8String(p);
-}
 function pmalloc() {
     return Memory.alloc(Process.pointerSize);
 }
@@ -47,11 +44,11 @@ var MonoApi = {
         var method, methods = {}, iter = pmalloc();
 
         while ( !(method = MonoApi.mono_class_get_methods(klass, iter)).isNull() ) {
-            var methodName = str(MonoApi.mono_method_get_name(method));
+            var methodName = MonoApi.mono_method_get_name(method).readUtf8String();
             if (!methodName.startsWith('<') /*|| methodName.startsWith('.')*/) {
                 var methodRef = MonoApi.mono_class_get_method_from_name(klass, Memory.allocUtf8String(methodName), -1);
                 var monoSignature = MonoApi.mono_method_signature(methodRef);
-                var retType = str(MonoApi.mono_type_full_name(MonoApi.mono_signature_get_return_type(monoSignature)));
+                var retType = MonoApi.mono_type_full_name(MonoApi.mono_signature_get_return_type(monoSignature)).readUtf8String();
                 var args = MonoApi.getSignatureParams(monoSignature);
                 methods[methodName] = { ref: methodRef, args: args, ret: retType };
             }
@@ -63,7 +60,7 @@ var MonoApi = {
         var params, fields = [], iter = pmalloc();
 
         while ( !(params = MonoApi.mono_signature_get_params(monoSignature, iter)).isNull() )
-            fields.push( str(MonoApi.mono_type_full_name(params)) );
+            fields.push( MonoApi.mono_type_full_name(params).readUtf8String() );
 
         return fields;
     },
@@ -71,7 +68,8 @@ var MonoApi = {
         var field, fields = [], iter = pmalloc();
 
         while ( !(field = MonoApi.mono_class_get_fields(monoClass, iter)).isNull() )
-            fields.push( str(MonoApi.mono_field_full_name(field)).split(':')[1] );
+            fields.push( 
+                MonoApi.mono_field_full_name(field).readUtf8String().split(':')[1] );
 
         return fields;
     },
@@ -119,7 +117,7 @@ function intercept(op) {
                 var j = i + 1;
                 switch (method.args[i]) {
                     case 'string':
-                        argsValues[key] = str(MonoApi.mono_string_to_utf8(args[j]));
+                        argsValues[key] = MonoApi.mono_string_to_utf8(args[j]).readUtf8String();
                         break;
                     case 'long':
                     case 'int':
@@ -149,10 +147,10 @@ function getMetadata(monoImage) {
     for (var i = 1, l = MonoApi.mono_image_get_table_rows(monoImage, 0x2); i < l; ++i) {
         // MONO_TOKEN_TYPE_DEF = 0x2000000 // https://github.com/mono/mono/blob/master/mono/metadata/tokentype.h#L16
         var mClass = MonoApi.mono_class_get(monoImage, 0x2000000 | i);
-        var className = str(MonoApi.mono_class_get_name(mClass));
-        var classNameSpace = str(MonoApi.mono_class_get_namespace(mClass));
+        var className = MonoApi.mono_class_get_name(mClass).readUtf8String();
+        var classNameSpace = MonoApi.mono_class_get_namespace(mClass).readUtf8String();
         try {
-            var parentClassName = str( MonoApi.mono_class_get_name( MonoApi.mono_class_get_parent(mClass) ) );
+            var parentClassName = MonoApi.mono_class_get_name( MonoApi.mono_class_get_parent(mClass) ).readUtf8String();
             if (parentClassName === 'MonoBehaviour' && classNameSpace === '') {
                 Metadata[className] = {
                     // namespace: classNameSpace,
@@ -175,7 +173,7 @@ function hookMonoLoad() {
             // passing variables to onLeave scope using 'this'
             this._args = {
                 image: args[0], // MonoImage* Image to load the assembly from
-                fname: str(args[1]) // const char* assembly name to associate with the assembly
+                fname: args[1].readUtf8String() // const char* assembly name to associate with the assembly
                 // status: args[2], // MonoImageOpenStatus* returns the status condition
                 // refonly: args[3] // gboolean Whether this assembly is being opened in "reflection-only" mode.
             };
