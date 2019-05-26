@@ -1,6 +1,5 @@
 // Constants
-const IGNORE_ARG = '-';
-const MIN_HEAP_SIZE = 10000;
+const kIgnoreArg = '-';
 
 // Utils
 function pmalloc() {
@@ -97,11 +96,6 @@ var MonoApi = {
 };
 
 function intercept(op) {
-    if (Frida.heapSize < MIN_HEAP_SIZE) {
-        console.error("Not enough heap. Too many hooks (?)");
-        return;
-        // [Feature] hook free() or watch for heapSize to alert when too hook
-    }
     var nothingSetSoJustLogMethodArguments = !op.argumentsKeys && !op.onEnterCallback && !op.onLeaveCallback;
     var method = Metadata[op.className].methods[op.methodName];
     debug('Intercepting', op.className + '#' + op.methodName, JSON.stringify(method));
@@ -112,7 +106,7 @@ function intercept(op) {
             var argsValues = {};
             for (var i = 0, l = method.args.length; i < l; i++) {
                 var key = op.argumentsKeys ? op.argumentsKeys[i] : i;
-                if (key === IGNORE_ARG)
+                if (key === kIgnoreArg)
                     continue;
                 var j = i + 1;
                 switch (method.args[i]) {
